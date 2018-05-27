@@ -1,6 +1,6 @@
-//******************************
+//******************************************************************************************
 //*Collecting data about dust in an air from PMS5003 and displaying it in LCD
-//******************************
+//******************************************************************************************
  
 #include <Arduino.h>
 #include "SPI.h"
@@ -40,8 +40,7 @@ int prev_dust10=0;
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
 
-void setup()
-{
+void setup() {
   //Configuring display
   tft.begin();
   tft.setRotation(1);
@@ -63,7 +62,58 @@ void setup()
   Serial.setTimeout(1500);
 }
 
-void loop()
-{
- 
+void loop() {
+   if(Serial.find(0x42)) {    //Dust sensor message stsrts with 0x42
+    Serial.readBytes(buf,LEN);
+  
+    if(buf[0] == 0x4d){
+      if(checkMessage(buf,LEN)){
+        //Parse dust metrics   
+
+        consoleOutput();
+      }           
+    } 
+    
+  }
 }
+
+char checkMessage(unsigned char *buf, char len) { 
+  bool messageIsOK=false;
+  int checkSum=0;
+
+  for(int i=0; i<(len-2); i++) {
+  checkSum=checkSum+buf[i];
+  }
+  checkSum=checkSum + 0x42;
+ 
+  if(checkSum == ((buf[len-2]<<8)+buf[len-1])) {
+    messageIsOK = true;
+  }
+  
+  return messageIsOK;
+}
+
+
+void consoleOutput() {
+    Serial.println((buf[1]<<8) + buf[2]); 
+    
+    Serial.print((buf[3]<<8) + buf[4]);    Serial.print("  ");
+    Serial.print((buf[5]<<8) + buf[6]);    Serial.print("  ");
+    Serial.println((buf[7]<<8) + buf[8]); 
+    
+    Serial.print((buf[9]<<8) + buf[10]);   Serial.print("  ");
+    Serial.print((buf[11]<<8) + buf[12]);  Serial.print("  ");
+    Serial.println((buf[13]<<8) + buf[14]);
+    
+    Serial.print((buf[15]<<8) + buf[16]);  Serial.print("  ");
+    Serial.print((buf[17]<<8) + buf[18]);  Serial.print("  ");
+    Serial.print((buf[19]<<8) + buf[20]);  Serial.print("  ");
+    Serial.print((buf[21]<<8) + buf[22]);  Serial.print("  ");
+    Serial.print((buf[23]<<8) + buf[24]);  Serial.print("  ");
+    Serial.println((buf[25]<<8) + buf[26]);
+    
+
+    Serial.println("");
+    Serial.println("");  
+}
+
