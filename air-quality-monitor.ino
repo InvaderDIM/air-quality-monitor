@@ -12,30 +12,30 @@
 #define LEN 31             //0x42 + 31 bytes. Message length from dust sensor
 unsigned char buf[LEN];
 
-// Main dust sensor parameters
-int pm1=0;               //Number on particles less that 1.0 ug/m3
-int pm2_5=0;              //Number on particles less that 2.5 ug/m3
-int pm10=0;               //Number on particles less that 10.0 ug/m3
 
-int prev_pm1=0;
-int prev_pm2_5=0;
-int prev_pm10=0;
+typedef struct {
+  char name[];
+  int value;
+  int oldValue;
+  int bytePos;            //Strat byte in message for that value
+} dust;
+
+// Main dust sensor parameters
+dust mainDustMetrics[] = {
+  { "PM1.0",  0, 0, 9 },          //Number on particles less that 1.0 ug/m3
+  { "PM2.5",  0, 0, 11 },         //Number on particles less that 2.5 ug/m3
+  { "PM10.0", 0, 0, 13 }          //Number on particles less that 10.0 ug/m3
+};
 
 // Detailed dust sensor parameters
-int dust0_3=0;           //Number on particles bigger that 0.3 ug/m3
-int dust0_5=0;
-int dust1=0;
-int dust2_5=0;
-int dust5=0;
-int dust10=0;
-
-int prev_dust0_3=0;
-int prev_dust0_5=0;
-int prev_dust1=0;
-int prev_dust2_5=0;
-int prev_dust5=0;
-int prev_dust10=0;
-
+dust detailedDustMetrics[] = {
+  { "PM0.3",  0, 0, 15 },         //Number on particles bigger that 0.3 ug/m3
+  { "PM0.5",  0, 0, 17 },
+  { "PM1.0",  0, 0, 19 },
+  { "PM2.5",  0, 0, 21 },
+  { "PM5.0",  0, 0, 23 },
+  { "PM10.0", 0, 0, 25 }
+};
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
@@ -91,6 +91,14 @@ char checkMessage(unsigned char *buf, char len) {
   }
   
   return messageIsOK;
+}
+
+int getDustValue(unsigned char *buf, dust metric) {
+  return (buf[metric.bytePos]<<8) + buf[metric.bytePos+1];
+}
+
+void updateDisplay() {
+  
 }
 
 
