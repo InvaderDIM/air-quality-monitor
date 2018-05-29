@@ -69,6 +69,12 @@ void loop() {
     if(buf[0] == 0x4d){
       if(checkMessage(buf,LEN)){
         //Parse dust metrics   
+        for (int i=0; i<sizeof(mainDustMetrics); i++) {
+          mainDustMetrics[i].value = getDustValue(buf, mainDustMetrics[i]);
+        }
+        for (int i=0; i<sizeof(detailedDustMetrics); i++) {
+          detailedDustMetrics[i].value = getDustValue(buf, detailedDustMetrics[i]); 
+        }
 
         consoleOutput();
       }           
