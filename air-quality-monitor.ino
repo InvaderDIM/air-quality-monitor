@@ -18,23 +18,25 @@ typedef struct {
   int value;
   int oldValue;
   int bytePos;            //Strat byte in message for that value
+  int displayXCoord;      //X coordinate on display
+  int displayYCoord;      //Y coordinate on display
 } dust;
 
 // Main dust sensor parameters
 dust mainDustMetrics[] = {
-  { "PM1.0",  0, 0, 9 },          //Number on particles less that 1.0 ug/m3
-  { "PM2.5",  0, 0, 11 },         //Number on particles less that 2.5 ug/m3
-  { "PM10.0", 0, 0, 13 }          //Number on particles less that 10.0 ug/m3
+  { "PM1.0",  0, 0, 9, 120, 0 },          //Number on particles less that 1.0 ug/m3
+  { "PM2.5",  0, 0, 11, 120, 24 },         //Number on particles less that 2.5 ug/m3
+  { "PM10.0", 0, 0, 13, 120, 48 }          //Number on particles less that 10.0 ug/m3
 };
 
 // Detailed dust sensor parameters
 dust detailedDustMetrics[] = {
-  { "PM0.3",  0, 0, 15 },         //Number on particles bigger that 0.3 ug/m3
-  { "PM0.5",  0, 0, 17 },
-  { "PM1.0",  0, 0, 19 },
-  { "PM2.5",  0, 0, 21 },
-  { "PM5.0",  0, 0, 23 },
-  { "PM10.0", 0, 0, 25 }
+  { "PM0.3",  0, 0, 15, 50, 96 },         //Number on particles bigger that 0.3 ug/m3
+  { "PM0.5",  0, 0, 17, 155, 96 },
+  { "PM1.0",  0, 0, 19, 243, 96 },
+  { "PM2.5",  0, 0, 21, 50, 112 },
+  { "PM5.0",  0, 0, 23, 145, 112 },
+  { "PM10.0", 0, 0, 25, 243, 112 }
 };
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
@@ -68,14 +70,23 @@ void loop() {
   
     if(buf[0] == 0x4d){
       if(checkMessage(buf,LEN)){
-        //Parse dust metrics   
+        //Parse ad display main dust metrics   
         for (int i=0; i<sizeof(mainDustMetrics); i++) {
           mainDustMetrics[i].value = getDustValue(buf, mainDustMetrics[i]);
+          if (mainDustMetrics[i].oldValue != mainDustMetrics[i].value) {  
+            displayMetrics(mainDustMetrics[i], 3);
+            mainDustMetrics[i].oldValue = mainDustMetrics[i].value;
+          }
         }
+        //Parse ad display detailed dust metrics   
         for (int i=0; i<sizeof(detailedDustMetrics); i++) {
           detailedDustMetrics[i].value = getDustValue(buf, detailedDustMetrics[i]); 
+          if (detailedDustMetrics[i].oldValue != detailedDustMetrics[i].value) {  
+            displayMetrics(detailedDustMetrics[i], 2);
+            detailedDustMetrics[i].oldValue = detailedDustMetrics[i].value;
+          }
         }
-
+        
         consoleOutput();
       }           
     } 
@@ -103,8 +114,17 @@ int getDustValue(unsigned char *buf, dust metric) {
   return (buf[metric.bytePos]<<8) + buf[metric.bytePos+1];
 }
 
-void updateDisplay() {
-  
+void displayMetrics(dust metric, int textSize) {
+  int width = 80;
+  int height = 21;
+  if (textSize == 2) {
+      width=50;
+      height=14;
+  }
+  tft.setTextColor(ILI9341_GREEN);
+  tft.fillRect(metric.displayXCoord, metric.displayYCoord, width, height, ILI9341_BLACK);
+  tft.setCursor(metric.displayXCoord, metric.displayYCoord);
+  tft.println(metric.value);
 }
 
 
