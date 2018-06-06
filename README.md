@@ -1,5 +1,5 @@
 # air-quality-monitor
-ESP8266 with TFT LCD and PMS5003 to control air quality
+ESP8266 with TFT LCD, PMS5003 and MH-Z19 to control air quality
 
 ## Where to get parts
 I have bought all components on Aliexpress. But you can find them in other online stores too.
@@ -11,3 +11,6 @@ microcontroller
 
 [PMS5003](https://ru.aliexpress.com/item/PLANTOWER-PM2-5-SENSOR-laser-dust-sensor-G5-PMS5003-High-precision-laser-dust-concentration-sensor-digital/32618735056.html?spm=a2g0v.10010108.1000016.1.28b4a861rupq9j&isOrigTitle=true)
 dust sensor
+
+[MH-Z19](https://ru.aliexpress.com/item/1PCS-module-MH-Z19-infrared-co2-sensor-for-co2-monitor-Free-shipping/32371956420.html?spm=a2g0v.10010108.1000016.1.58f5d000mnZ2rr&isOrigTitle=true)
+CO2 sensor
