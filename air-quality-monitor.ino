@@ -12,6 +12,12 @@
 #define LEN 31             //0x42 + 31 bytes. Message length from dust sensor
 unsigned char buf[LEN];
 
+typedef struct {
+   int value;
+   int oldValue;
+   int displayXCoord;      //X coordinate on display
+   int displayYCoord;      //Y coordinate on display
+} co2;
 
 typedef struct {
   char name[];
